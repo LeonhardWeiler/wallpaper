@@ -1,0 +1,7 @@
+#!/bin/sh
+# Zufällige Auswahl eines Wallpapers aus dem Ordner
+WALLPAPER=$(find /home/leo/.config/wallpaper/Eugene-Boudin/ -type f | shuf -n 1)
+
+# Wallpaper mit feh setzen
+feh --no-fehbg --bg-fill "$WALLPAPER"
+
