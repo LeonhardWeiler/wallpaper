@@ -1,7 +1,34 @@
 #!/bin/sh
-# Zufällige Auswahl eines Wallpapers aus dem Ordner
-WALLPAPER=$(find /home/leo/.config/wallpaper/pictures/ -type f | shuf -n 1)
 
-# Wallpaper mit feh setzen
+# Pfad zur Datei, in der das vorherige Wallpaper gespeichert wird
+PREV_WALLPAPER_FILE="/home/leo/.config/wallpaper/.prev_wall"
+
+# Speicherort der Wallpaper-Bilder
+WALLPAPER_DIR="/home/leo/.config/wallpaper/pictures/"
+
+# Stelle sicher, dass der Speicherort existiert
+if [ ! -d "$WALLPAPER_DIR" ]; then
+  echo "Wallpaper-Verzeichnis existiert nicht: $WALLPAPER_DIR"
+  exit 1
+fi
+
+# Liste aller verfügbaren Bilder, das vorherige Bild ausschließen
+if [ -f "$PREV_WALLPAPER_FILE" ]; then
+  PREV_WALLPAPER=$(cat "$PREV_WALLPAPER_FILE")
+  WALLPAPER=$(find "$WALLPAPER_DIR" -type f | grep -vF "$PREV_WALLPAPER" | shuf -n 1)
+else
+  WALLPAPER=$(find "$WALLPAPER_DIR" -type f | shuf -n 1)
+fi
+
+# Falls kein neues Wallpaper gefunden wurde (z.B. alle sind ausgeschlossen)
+if [ -z "$WALLPAPER" ]; then
+  echo "Kein neues Wallpaper verfügbar, es wird erneut gemischt."
+  WALLPAPER=$(find "$WALLPAPER_DIR" -type f | shuf -n 1)
+fi
+
+# Setze das Wallpaper mit feh
 feh --no-fehbg --bg-fill "$WALLPAPER"
+
+# Speichere das aktuelle Wallpaper als vorheriges
+echo "$WALLPAPER" > "$PREV_WALLPAPER_FILE"
 
